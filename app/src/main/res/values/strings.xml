@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AirportApp</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="updateButtonText">Store in DB</string>
+    <string name="showButtonText">Show DB</string>
+    <string name="title_activity_maps">Map</string>
+</resources>
