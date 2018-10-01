@@ -1,7 +1,9 @@
 package com.example.justi.airportapp;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -9,7 +11,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -63,6 +68,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
+        drawMarkers(schiphol, destination);
+
         if(destination != null){
             mMap.moveCamera(CameraUpdateFactory.newLatLng(destination));
 
@@ -76,6 +83,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             mMap.addPolyline(line);
             mMap.addPolyline(geodesicLine);
+        }
+
+    }
+
+    public void drawMarkers(final LatLng schiphol, final LatLng destination){
+        Handler handler = new Handler();
+        final MarkerOptions markerOptions = new MarkerOptions().position(destination);
+        final Marker marker = mMap.addMarker(markerOptions);
+        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.airplane));
+        marker.setRotation(0.25f);
+
+        for(int i = 1; i <= 1000; i++){
+            final int j = i;
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    double lati = ((schiphol.latitude - destination.latitude) / 1000) * j;
+                    double latitude = destination.latitude + lati;
+                    double longi = ((schiphol.longitude - destination.longitude) / 1000) * j;
+                    double longitude = destination.longitude + longi;
+                    LatLng difference = new LatLng(latitude, longitude);
+                    marker.setPosition(difference);
+                }
+            }, 10 * i);
         }
     }
 }
