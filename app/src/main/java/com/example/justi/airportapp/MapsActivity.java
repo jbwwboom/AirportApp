@@ -53,38 +53,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String icao = intent.getStringExtra(Constants.ICAO);
         String schipholIcao = Constants.SCHIPHOL;
 
+
         ArrayList<Airport> airports = AirportDatabaseFactory.getInstance(this).getAirports(false);
+        if(!icao.equals(schipholIcao)){
+            LatLng destination = null;
+            LatLng schiphol = null;
 
-        LatLng destination = null;
-        LatLng schiphol = null;
+            for(Airport airport : airports){
+                if(airport.getIcao().equals(icao)){
+                    destination = new LatLng(airport.getLatitude(), airport.getLongitude());
+                    mMap.addMarker(new MarkerOptions().position(destination).title("Marker in " + airport.getName()));
+                }else if(airport.getIcao().equals(schipholIcao)){
+                    schiphol = new LatLng(airport.getLatitude(), airport.getLongitude());
+                    mMap.addMarker(new MarkerOptions().position(schiphol).title("Marker in " + airport.getName()));
+                }
+            }
 
-        for(Airport airport : airports){
-            if(airport.getIcao().equals(icao)){
-                destination = new LatLng(airport.getLatitude(), airport.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(destination).title("Marker in " + airport.getName()));
-            }else if(airport.getIcao().equals(schipholIcao)){
-                schiphol = new LatLng(airport.getLatitude(), airport.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(schiphol).title("Marker in " + airport.getName()));
+            drawMarkers(schiphol, destination);
+
+            if(destination != null){
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(destination));
+
+                PolylineOptions line=
+                        new PolylineOptions().add(destination, schiphol)
+                                .width(5).color(Color.BLUE);
+
+                PolylineOptions geodesicLine =
+                        new PolylineOptions().add(destination, schiphol)
+                                .width(5).color(Color.RED).geodesic(true);
+
+                mMap.addPolyline(line);
+                mMap.addPolyline(geodesicLine);
+            }
+        }else{
+            for(Airport airport : airports){
+                if(airport.getIcao().equals(schipholIcao)){
+                    LatLng schiphol = new LatLng(airport.getLatitude(), airport.getLongitude());
+                    mMap.addMarker(new MarkerOptions().position(schiphol).title("Marker in " + airport.getName()));
+                }
             }
         }
-
-        drawMarkers(schiphol, destination);
-
-        if(destination != null){
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(destination));
-
-            PolylineOptions line=
-                    new PolylineOptions().add(destination, schiphol)
-                            .width(5).color(Color.BLUE);
-
-            PolylineOptions geodesicLine =
-                    new PolylineOptions().add(destination, schiphol)
-                            .width(5).color(Color.RED).geodesic(true);
-
-            mMap.addPolyline(line);
-            mMap.addPolyline(geodesicLine);
-        }
-
     }
 
     public void drawMarkers(final LatLng schiphol, final LatLng destination){
